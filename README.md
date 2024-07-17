@@ -40,3 +40,22 @@ To capture traffic, the following `tcpdump` command was used:
 ```bash
 sudo tcpdump -i <interface> -w traffic_capture.pcap
 
+
+## Python Script for Bidirectional Flow Extraction
+
+In addition to capturing network traffic, we developed a Python script to extract and process each bidirectional flow from the captured `pcap` files. The script considers the following attributes for each flow:
+
+- **Source IP Address**
+- **Destination IP Address**
+- **Source Port**
+- **Destination Port**
+- **Protocol**
+
+### Functionality of the Script
+
+The script performs the following tasks:
+
+1. **Flow Detection**: It identifies and separates each bidirectional flow based on the source IP, destination IP, source port, destination port, and protocol.
+2. **UDP Datagram Processing**: For each detected bidirectional flow, the script isolates UDP datagrams.
+3. **Datagram Encoding**: The isolated UDP datagrams are then stored and encoded for further analysis.
+
