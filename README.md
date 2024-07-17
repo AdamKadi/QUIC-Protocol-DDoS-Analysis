@@ -39,9 +39,9 @@ To capture traffic, the following `tcpdump` command was used:
 
 ```bash
 sudo tcpdump -i <interface> -w traffic_capture.pcap
+```
 
-
-## Python Script for Bidirectional Flow Extraction
+### Python Script for Bidirectional Flow Extraction
 
 In addition to capturing network traffic, we developed a Python script to extract and process each bidirectional flow from the captured `pcap` files. The script considers the following attributes for each flow:
 
