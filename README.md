@@ -79,3 +79,9 @@ The following features are calculated for each detected bidirectional flow:
 | **Significant time gap in comparison to the total communication time (24)** | Count of time gaps detected between each packet using various thresholds relative to the total time of all packets for each identified agent. This metric is calculated for the incoming, outgoing, and bidirectional flows of the detected agents. |
 
 This detailed extraction and feature computation enable comprehensive analysis of the network traffic, aiding in understanding patterns and identifying anomalies.
+
+
+
+### Link pcap file
+
+https://drive.google.com/file/d/17yuEqWXWEpyvoxhua5M7BCJnp6zWGPSD/view?usp=drive_link
