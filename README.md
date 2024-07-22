@@ -82,6 +82,12 @@ This detailed extraction and feature computation enable comprehensive analysis o
 
 
 
+
+
 ### Link pcap file
 
 https://drive.google.com/file/d/17yuEqWXWEpyvoxhua5M7BCJnp6zWGPSD/view?usp=drive_link
+
+
+This link contains network traffic captures (PCAP) illustranting a GET flood attack on a web server using the HTTP/3 protocol (QUIC). In this simulation, several bots send GET requests continuously to the server, generating attack traffic.
+
