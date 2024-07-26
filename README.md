@@ -91,3 +91,9 @@ https://drive.google.com/file/d/17yuEqWXWEpyvoxhua5M7BCJnp6zWGPSD/view?usp=drive
 
 This link contains network traffic captures (PCAP) illustranting a GET flood attack on a web server using the HTTP/3 protocol (QUIC). In this simulation, several bots send GET requests continuously to the server, generating attack traffic.
 
+### Dataset description
+
+## The HTTP GET flood class involves a bot establishing a connection with the web server and continuously sending GET requests over this connection throughout the attack. This results in a single bidirectional flow between the bot and the web server during the attack.
+
+## The Normal Use class involves a bot establishing a connection with the web server and emulating a web client to navigate between the client and the server. This class represents the bidirectional flows of such traffic, reflecting typical web interactions.
+

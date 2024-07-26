@@ -537,19 +537,28 @@ def calculate_packet_size_variation_incoming_outgoing(flow_dict):
     return variation_incoming_packets, variation_outgoing_packets
 
 
+import math
 
+def calculate_packet_size_std_deviation(flow_dict):
+    """
+    This function calculates the standard deviation of packet sizes for each flow.
 
+    Parameters:
+    flow_dict (dict): A dictionary where the key is the flow identifier (a tuple of source IP address and source port),
+                      and the value is a list of encoded UDP datagrams for that flow.
 
+    Returns:
+    list: A list containing the standard deviation of packet sizes for each flow.
+    """
 
-
-def packet_size_std_deviation(dico):
     std_deviations = []
 
-    for _, pile in dico.items():
-        packet_sizes = [int(paquet[7]) for paquet in pile]
+    for flow_id, packets in flow_dict.items():
+        packet_sizes = [int(packet[7]) for packet in packets]
+
         if len(packet_sizes) > 1:
             mean = sum(packet_sizes) / len(packet_sizes)
-            variance = sum((x - mean) ** 2 for x in packet_sizes) / (len(packet_sizes)-1)
+            variance = sum((size - mean) ** 2 for size in packet_sizes) / (len(packet_sizes) - 1)
             std_deviation = math.sqrt(variance)
             std_deviations.append(std_deviation)
         else:
@@ -557,9 +566,7 @@ def packet_size_std_deviation(dico):
 
     return std_deviations
 
-
-
-############################################## Inter arrival time ######
+# Inter arrival time #
 
 def convert_to_datetime(timestamp):
     return datetime.datetime.fromtimestamp(timestamp)
@@ -569,383 +576,271 @@ def calcule_IAT(timestamps):
     iats = []
     for i in range(1, len(timestamps)):
         iat = timestamps[i] - timestamps[i-1]
-        iats;append(iat)
+        iats.append(iat)
     return iats
 
 
-def iat(dico):
+def calculate_iat_statistics(flow_dict):
+    """
+    This function calculates statistics related to Inter-Arrival Time (IAT) for each flow.
+
+    Parameters:
+    flow_dict (dict): A dictionary where the key is the flow identifier (a tuple of source IP address and source port),
+                      and the value is a list of encoded UDP datagrams for that flow. Each datagram should include a timestamp.
+
+    Returns:
+    tuple: A tuple containing lists of mean, standard deviation, skewness, and variance of IAT for each flow.
+    """
+
     mean_iat_list = []
     std_dev_iat_list = []
     skewness_iat_list = []
-    variance_iat_list = []  # Liste pour stocker les variances
+    variance_iat_list = []
 
-    for key, values in dicto.items():
-        liste = []
-        cpt = 0
-        for i in range(1, len(values)):
-            iat = values[i][8] - values[i-1][8]
-            cpt += iat
-            liste.append(iat)
-        
-        #Calcule de la moyenne
-        mean_iat = cpt / len(values)
+    for flow_id, packets in flow_dict.items():
+        iat_list = []
+        total_iat = 0
+
+        # Calculate inter-arrival times (IAT)
+        for i in range(1, len(packets)):
+            iat = packets[i][8] - packets[i-1][8]  # Assuming timestamp is at index 8
+            iat_list.append(iat)
+            total_iat += iat
+
+        # Calculate mean IAT
+        mean_iat = total_iat / len(packets)
         mean_iat_list.append(mean_iat)
 
-        # Calcul de l'écart-type
-        variance = sum((x - mean_iat) ** 2 for x in liste) / len(liste)
-        variance_iat_list.append(variance)
-        
-        std_dev_iat = math.sqrt(variance)
+        # Calculate variance of IAT
+        variance_iat = sum((iat - mean_iat) ** 2 for iat in iat_list) / len(iat_list)
+        variance_iat_list.append(variance_iat)
+
+        # Calculate standard deviation of IAT
+        std_dev_iat = math.sqrt(variance_iat)
         std_dev_iat_list.append(std_dev_iat)
 
-        #Calcul du skewness
-        skewness = (sum((x - mean_iat) ** 3 for x in liste) / len(liste)) / (std_dev_iat ** 3)
+        # Calculate skewness of IAT
+        skewness_iat = (sum((iat - mean_iat) ** 3 for iat in iat_list) / len(iat_list)) / (std_dev_iat ** 3)
         skewness_iat_list.append(skewness)
 
-            #print(f"IAT entre {values[i-1][8]} et {values[i][8]} : {iat} secondes")
     return mean_iat_list, std_dev_iat_list, skewness_iat_list, variance_iat_list
 
 
-def iat_incoming(dico):
-    mean_iat_list_0 = []
-    std_dev_iat_list_0 = []
-    skewness_iat_list_0 = []
-    variance_iat_list_0 = []
+def calculate_iat_incoming_outgoing(flow_dict):
+    """
+    This function calculates the mean, standard deviation, skewness, and variance of Inter-Arrival Time (IAT)
+    for incoming and outgoing packets in each flow.
 
-    mean_iat_list_1 = []
-    std_dev_iat_list_1 = []
-    skewness_iat_list_1 = []
-    variance_iat_list_1 = []
+    Parameters:
+    flow_dict (dict): A dictionary where the key is the flow identifier (a tuple of source IP address and source port),
+                      and the value is a list of encoded UDP datagrams for that flow. Each datagram should include a timestamp and direction flag.
 
-    for key, values in dico.items():
-        liste_0 = []
-        liste_1 = []
-        cpt_0 = 0
-        cpt_1 = 0
+    Returns:
+    tuple: A tuple containing four lists each for incoming and outgoing packets:
+           - mean_iat_list_incoming
+           - std_dev_iat_list_incoming
+           - skewness_iat_list_incoming
+           - variance_iat_list_incoming
+           - mean_iat_list_outgoing
+           - std_dev_iat_list_outgoing
+           - skewness_iat_list_outgoing
+           - variance_iat_list_outgoing
+    """
+    mean_iat_list_incoming = []
+    std_dev_iat_list_incoming = []
+    skewness_iat_list_incoming = []
+    variance_iat_list_incoming = []
 
-        for i in range(1, len(values)):
-            if values[i-1][6] == 0:
-                iat = values[i][8] - values[i-1][8]
-                cpt_0 += iat
-                liste_0.append(iat)
-            elif values[i-1][6] == 1:
-                iat = values[i][8] - values[i-1][8]
-                cpt_1 += iat
-                liste_1.append(iat)
-        
-        if len(liste_0) > 0:
-            mean_iat_0 = cpt_0 / len(liste_0)
-            variance_0 = sum((x - mean_iat_0) ** 2 for x in liste_0) / len(liste_0)
+    mean_iat_list_outgoing = []
+    std_dev_iat_list_outgoing = []
+    skewness_iat_list_outgoing = []
+    variance_iat_list_outgoing = []
+
+    for flow_id, packets in flow_dict.items():
+        iat_incoming = []
+        iat_outgoing = []
+        total_iat_incoming = 0
+        total_iat_outgoing = 0
+
+        for i in range(1, len(packets)):
+            iat = packets[i][8] - packets[i-1][8]  # Assuming timestamp is at index 8
+            if packets[i-1][6] == 0:  # Assuming direction flag is at index 6 (0 for incoming)
+                total_iat_incoming += iat
+                iat_incoming.append(iat)
+            elif packets[i-1][6] == 1:  # Assuming direction flag is at index 6 (1 for outgoing)
+                total_iat_outgoing += iat
+                iat_outgoing.append(iat)
+
+        if iat_incoming:
+            mean_iat_incoming = total_iat_incoming / len(iat_incoming)
+            variance_incoming = sum((x - mean_iat_incoming) ** 2 for x in iat_incoming) / len(iat_incoming)
             
-            if variance_0 != 0:  # Vérification de la variance non nulle
-                std_dev_iat_0 = math.sqrt(variance_0)
-                skewness_0 = (sum((x - mean_iat_0) ** 3 for x in liste_0) / len(liste_0)) / (std_dev_iat_0 ** 3)
+            if variance_incoming != 0:
+                std_dev_iat_incoming = math.sqrt(variance_incoming)
+                skewness_incoming = (sum((x - mean_iat_incoming) ** 3 for x in iat_incoming) / len(iat_incoming)) / (std_dev_iat_incoming ** 3)
             else:
-                std_dev_iat_0 = 0  # Si la variance est nulle, l'écart-type et le skewness sont également nuls
-                skewness_0 = 0
+                std_dev_iat_incoming = 0
+                skewness_incoming = 0
 
-            mean_iat_list_0.append(mean_iat_0)
-            std_dev_iat_list_0.append(std_dev_iat_0)
-            skewness_iat_list_0.append(skewness_0)
-            variance_iat_list_0.append(variance_0)
+            mean_iat_list_incoming.append(mean_iat_incoming)
+            std_dev_iat_list_incoming.append(std_dev_iat_incoming)
+            skewness_iat_list_incoming.append(skewness_incoming)
+            variance_iat_list_incoming.append(variance_incoming)
+        else:
+            mean_iat_list_incoming.append(0)
+            std_dev_iat_list_incoming.append(0)
+            skewness_iat_list_incoming.append(0)
+            variance_iat_list_incoming.append(0)
 
-        elif len(liste_0) == 0:
-            mean_iat_list_0.append(0)
-            std_dev_iat_list_0.append(0)
-            skewness_iat_list_0.append(0)
-            variance_iat_list_0.append(0)
-
+        if iat_outgoing:
+            mean_iat_outgoing = total_iat_outgoing / len(iat_outgoing)
+            variance_outgoing = sum((x - mean_iat_outgoing) ** 2 for x in iat_outgoing) / len(iat_outgoing)
             
-        if len(liste_1) > 0:
-            mean_iat_1 = cpt_1 / len(liste_1)
-            variance_1 = sum((x - mean_iat_1) ** 2 for x in liste_1) / len(liste_1)
-            
-            if variance_1 != 0:  # Vérification de la variance non nulle
-                
-                std_dev_iat_1 = math.sqrt(variance_1)
-                skewness_1 = (sum((x - mean_iat_1) ** 3 for x in liste_1) / len(liste_1)) / (std_dev_iat_1 ** 3)
-            
+            if variance_outgoing != 0:
+                std_dev_iat_outgoing = math.sqrt(variance_outgoing)
+                skewness_outgoing = (sum((x - mean_iat_outgoing) ** 3 for x in iat_outgoing) / len(iat_outgoing)) / (std_dev_iat_outgoing ** 3)
             else:
-                
-                std_dev_iat_1 = 0  # Si la variance est nulle, l'écart-type et le skewness sont également nuls
-                skewness_1 = 0
+                std_dev_iat_outgoing = 0
+                skewness_outgoing = 0
 
-            std_dev_iat_1 = math.sqrt(variance_1)
-            skewness_1 = (sum((x - mean_iat_1) ** 3 for x in liste_1) / len(liste_1)) / (std_dev_iat_1 ** 3)
-
-            mean_iat_list_1.append(mean_iat_1)
-            std_dev_iat_list_1.append(std_dev_iat_1)
-            skewness_iat_list_1.append(skewness_1)
-            variance_iat_list_1.append(variance_1)
-
-        elif len(liste_1) == 0:
-            mean_iat_list_1.append(0)
-            std_dev_iat_list_1.append(0)
-            skewness_iat_list_1.append(0)
-            variance_iat_list_1.append(0)
-
-        
+            mean_iat_list_outgoing.append(mean_iat_outgoing)
+            std_dev_iat_list_outgoing.append(std_dev_iat_outgoing)
+            skewness_iat_list_outgoing.append(skewness_outgoing)
+            variance_iat_list_outgoing.append(variance_outgoing)
+        else:
+            mean_iat_list_outgoing.append(0)
+            std_dev_iat_list_outgoing.append(0)
+            skewness_iat_list_outgoing.append(0)
+            variance_iat_list_outgoing.append(0)
 
     return (
-        mean_iat_list_0, std_dev_iat_list_0, skewness_iat_list_0, variance_iat_list_0,
-        mean_iat_list_1, std_dev_iat_list_1, skewness_iat_list_1, variance_iat_list_1
+        mean_iat_list_incoming, std_dev_iat_list_incoming, skewness_iat_list_incoming, variance_iat_list_incoming,
+        mean_iat_list_outgoing, std_dev_iat_list_outgoing, skewness_iat_list_outgoing, variance_iat_list_outgoing
     )
 
 
 
-def ratio_nb_quic_packets_in_udp(dico):
-    liste_one = []
-    liste_two = []
-    for cle, valeur in dico.items():
-        cpt_total = 0
-        cpt_more_one = 0
-        cpt_one = 0
-        for pkt in valeur:
-            cpt_total += 1
-            if pkt[0] > 1:
-                cpt_more_one += 1
-            elif pkt[0] == 1:
-                cpt_one += 1
-        res = cpt_one / cpt_total
-        res1 = cpt_more_one /cpt_total
-        liste_one.append(res)
-        liste_two.append(res1)
-    return liste_one, liste_two
-        
+def ratio_nb_quic_packets_in_udp(flow_dict):
+    """
+    This function calculates the ratio of QUIC packets within UDP datagrams for each flow.
+
+    Parameters:
+    flow_dict (dict): A dictionary where the key is the flow identifier (a tuple of source IP address and source port),
+                      and the value is a list of encoded UDP datagrams for that flow. Each datagram should include the
+                      number of QUIC packets.
+
+    Returns:
+    tuple: A tuple containing two lists:
+           - ratio_one_quic_packet_list: Ratios of datagrams with exactly one QUIC packet to the total number of datagrams for each flow.
+           - ratio_more_than_one_quic_packet_list: Ratios of datagrams with more than one QUIC packet to the total number of datagrams for each flow.
+    """
+    ratio_one_quic_packet_list = []
+    ratio_more_than_one_quic_packet_list = []
+
+    for flow_id, packets in flow_dict.items():
+        total_packets = 0
+        one_quic_packet_count = 0
+        more_than_one_quic_packet_count = 0
+
+        for packet in packets:
+            total_packets += 1
+            if packet[0] > 1:
+                more_than_one_quic_packet_count += 1
+            elif packet[0] == 1:
+                one_quic_packet_count += 1
+
+        if total_packets > 0:
+            ratio_one = one_quic_packet_count / total_packets
+            ratio_more_than_one = more_than_one_quic_packet_count / total_packets
+        else:
+            ratio_one = 0
+            ratio_more_than_one = 0
+
+        ratio_one_quic_packet_list.append(ratio_one)
+        ratio_more_than_one_quic_packet_list.append(ratio_more_than_one)
+
+    return ratio_one_quic_packet_list, ratio_more_than_one_quic_packet_list
 
 
+def count_significant_gaps(flow_dict):
+    """
+    This function calculates the number of significant gaps between packet timestamps for each flow,
+    normalized by the session time.
 
-def count_significant_gaps(dico):
-    liste_lower_three = []
-    threshold_lower_three = 0.0001
-    
-    liste_lower_two = []
-    threshold_lower_two = 0.001
-    
-    liste_lower_one = []
-    threshold_lower_one = 0.01
-    
-    liste_lower = []
-    threshold_lower = 0.1
- 
-    liste = []
-    threshold = 1
+    Parameters:
+    flow_dict (dict): A dictionary where the key is the flow identifier (a tuple of source IP address and source port),
+                      and the value is a list of encoded UDP datagrams for that flow. Each datagram should include a
+                      timestamp at index 8.
 
-    liste_two = []
-    threshold_two = 30 
+    Returns:
+    tuple: A tuple containing lists of normalized significant gap counts for various thresholds.
+    """
+    lower_three_list = []
+    lower_three_threshold = 0.0001
 
-    liste_three = []
+    lower_two_list = []
+    lower_two_threshold = 0.001
+
+    lower_one_list = []
+    lower_one_threshold = 0.01
+
+    lower_list = []
+    lower_threshold = 0.1
+
+    list_one = []
+    threshold_one = 1
+
+    list_two = []
+    threshold_two = 30
+
+    list_three = []
     threshold_three = 60
 
-    liste_four = []
+    list_four = []
     threshold_four = 300
 
+    for flow_id, packets in flow_dict.items():
+        timestamps = [packet[8] for packet in packets]  # Retrieve timestamps of each packet
+        session_time = timestamps[-1] - timestamps[0]  # Calculate session duration
 
-    significant_gaps_count_lower_three = 0
-    significant_gaps_count_lower_two = 0
-    significant_gaps_count_lower_one = 0
-    significant_gaps_count_lower = 0
-    significant_gaps_count = 0
-    significant_gaps_count_2 = 0
-    significant_gaps_count_3 = 0
-    significant_gaps_count_4 = 0
-    
-    for cle, valeur in dico.items():
-        timestamp = [packet[8] for packet in valeur] # Récupère les timestamps de chaque paquet
-        session_time = timestamp[-1] - timestamp[0]
-        #print(session_time)
-        for i in range(1, len(timestamp)):
-            gap = timestamp[i] - timestamp[i-1]
-            if gap > threshold:
-                significant_gaps_count += 1
-            elif gap > threshold_two:
-                significant_gaps_count_2 += 1
+        count_lower_three = 0
+        count_lower_two = 0
+        count_lower_one = 0
+        count_lower = 0
+        count_one = 0
+        count_two = 0
+        count_three = 0
+        count_four = 0
+
+        for i in range(1, len(timestamps)):
+            gap = timestamps[i] - timestamps[i - 1]
+            if gap > threshold_four:
+                count_four += 1
             elif gap > threshold_three:
-                significant_gaps_count_3 += 1
-            elif gap > threshold_four:
-                significant_gaps_count_4 += 1
-            elif gap > threshold_lower:
-                significant_gaps_count_lower += 1
-            elif gap > threshold_lower_one:
-                significant_gaps_count_lower_one += 1
-            elif gap > threshold_lower_two:
-                significant_gaps_count_lower_two += 1
-            elif gap > threshold_lower_three:
-                significant_gaps_count_lower_three += 1
-
-        liste_lower_three.append(significant_gaps_count_lower_three / session_time)
-        liste_lower_two.append(significant_gaps_count_lower_two / session_time)
-        liste_lower_one.append(significant_gaps_count_lower_one / session_time)
-        liste_lower.append(significant_gaps_count_lower / session_time)
-        liste.append(significant_gaps_count / session_time)
-        liste_two.append(significant_gaps_count_2 / session_time)
-        liste_three.append(significant_gaps_count_3 / session_time)
-        liste_four.append(significant_gaps_count_4 / session_time)
-
-        
-
-    return liste_lower_three, liste_lower_two, liste_lower_one, liste_lower, liste, liste_two, liste_three, liste_four
-
-
-
-def count_significant_gaps_incoming(dico):
-    liste_lower_three = []
-    threshold_lower_three = 0.0001
-    
-    liste_lower_two = []
-    threshold_lower_two = 0.001
-    
-    liste_lower_one = []
-    threshold_lower_one = 0.01
-    
-    liste_lower = []
-    threshold_lower = 0.1
- 
-    liste = []
-    threshold = 1
-
-    liste_two = []
-    threshold_two = 30 
-
-    liste_three = []
-    threshold_three = 60
-
-    liste_four = []
-    threshold_four = 300
-
-
-    significant_gaps_count_lower_three = 0
-    significant_gaps_count_lower_two = 0
-    significant_gaps_count_lower_one = 0
-    significant_gaps_count_lower = 0
-    significant_gaps_count = 0
-    significant_gaps_count_2 = 0
-    significant_gaps_count_3 = 0
-    significant_gaps_count_4 = 0
-    
-    for cle, valeur in dico.items():
-        timestamp = [packet[8] for packet in valeur if packet[6] == 1] # Récupère les timestamps de chaque paquet
-        session_time = valeur[-1][8] -  valeur[0][8]
-        
-        for i in range(1, len(timestamp)):
-            gap = timestamp[i] - timestamp[i-1]
-            if gap > threshold:
-                significant_gaps_count += 1
+                count_three += 1
             elif gap > threshold_two:
-                significant_gaps_count_2 += 1
-            elif gap > threshold_three:
-                significant_gaps_count_3 += 1
-            elif gap > threshold_four:
-                significant_gaps_count_4 += 1
-            elif gap > threshold_lower:
-                significant_gaps_count_lower += 1
-            elif gap > threshold_lower_one:
-                significant_gaps_count_lower_one += 1
-            elif gap > threshold_lower_two:
-                significant_gaps_count_lower_two += 1
-            elif gap > threshold_lower_three:
-                significant_gaps_count_lower_three += 1
+                count_two += 1
+            elif gap > threshold_one:
+                count_one += 1
+            elif gap > lower_threshold:
+                count_lower += 1
+            elif gap > lower_one_threshold:
+                count_lower_one += 1
+            elif gap > lower_two_threshold:
+                count_lower_two += 1
+            elif gap > lower_three_threshold:
+                count_lower_three += 1
 
-        liste_lower_three.append(significant_gaps_count_lower_three / session_time)
-        liste_lower_two.append(significant_gaps_count_lower_two / session_time)
-        liste_lower_one.append(significant_gaps_count_lower_one / session_time)
-        liste_lower.append(significant_gaps_count_lower / session_time)
-        liste.append(significant_gaps_count / session_time)
-        liste_two.append(significant_gaps_count_2 / session_time)
-        liste_three.append(significant_gaps_count_3 / session_time)
-        liste_four.append(significant_gaps_count_4 / session_time)
+        lower_three_list.append(count_lower_three / session_time)
+        lower_two_list.append(count_lower_two / session_time)
+        lower_one_list.append(count_lower_one / session_time)
+        lower_list.append(count_lower / session_time)
+        list_one.append(count_one / session_time)
+        list_two.append(count_two / session_time)
+        list_three.append(count_three / session_time)
+        list_four.append(count_four / session_time)
 
-        
-
-    return liste_lower_three, liste_lower_two, liste_lower_one, liste_lower, liste, liste_two, liste_three, liste_four
-        
-
-
-def count_significant_gaps_outgoing(dico):
-    liste_lower_three = []
-    threshold_lower_three = 0.0001
-    
-    liste_lower_two = []
-    threshold_lower_two = 0.001
-    
-    liste_lower_one = []
-    threshold_lower_one = 0.01
-    
-    liste_lower = []
-    threshold_lower = 0.1
- 
-    liste = []
-    threshold = 1
-
-    liste_two = []
-    threshold_two = 30 
-
-    liste_three = []
-    threshold_three = 60
-
-    liste_four = []
-    threshold_four = 300
-
-
-    significant_gaps_count_lower_three = 0
-    significant_gaps_count_lower_two = 0
-    significant_gaps_count_lower_one = 0
-    significant_gaps_count_lower = 0
-    significant_gaps_count = 0
-    significant_gaps_count_2 = 0
-    significant_gaps_count_3 = 0
-    significant_gaps_count_4 = 0
-    
-    for cle, valeur in dico.items():
-        timestamp = [packet[8] for packet in valeur if packet[6] == 0] # Récupère les timestamps de chaque paquet
-        session_time = valeur[-1][8] -  valeur[0][8]
-        for i in range(1, len(timestamp)):
-            gap = timestamp[i] - timestamp[i-1]
-            if gap > threshold:
-                significant_gaps_count += 1
-            elif gap > threshold_two:
-                significant_gaps_count_2 += 1
-            elif gap > threshold_three:
-                significant_gaps_count_3 += 1
-            elif gap > threshold_four:
-                significant_gaps_count_4 += 1
-            elif gap > threshold_lower:
-                significant_gaps_count_lower += 1
-            elif gap > threshold_lower_one:
-                significant_gaps_count_lower_one += 1
-            elif gap > threshold_lower_two:
-                significant_gaps_count_lower_two += 1
-            elif gap > threshold_lower_three:
-                significant_gaps_count_lower_three += 1
-
-        liste_lower_three.append(significant_gaps_count_lower_three / session_time)
-        liste_lower_two.append(significant_gaps_count_lower_two / session_time)
-        liste_lower_one.append(significant_gaps_count_lower_one / session_time)
-        liste_lower.append(significant_gaps_count_lower / session_time)
-        liste.append(significant_gaps_count / session_time)
-        liste_two.append(significant_gaps_count_2 / session_time)
-        liste_three.append(significant_gaps_count_3 / session_time)
-        liste_four.append(significant_gaps_count_4 / session_time)
-
-        
-
-    return liste_lower_three, liste_lower_two, liste_lower_one, liste_lower, liste, liste_two, liste_three, liste_four
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    return lower_three_list, lower_two_list, lower_one_list, lower_list, list_one, list_two, list_three, list_four
 
 
 
