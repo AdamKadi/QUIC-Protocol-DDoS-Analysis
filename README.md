@@ -43,13 +43,52 @@ sudo tcpdump -i <interface> -w traffic_capture.pcap
 
 ### Python Script for Bidirectional Flow Extraction
 
-In addition to capturing network traffic, we developed a Python script to extract and process each bidirectional flow from the captured `pcap` files. The script considers the following attributes for each flow:
+# Definition of a Bidirectional Network Flow for an HTTP/3 Web Server
 
-- **Source IP Address**
-- **Destination IP Address**
-- **Source Port**
-- **Destination Port**
-- **Protocol**
+A bidirectional network flow refers to a set of communications between two points on a network, characterized by the exchange of packets in both directions. In the context of a web server using the HTTP/3 protocol, these flows are particularly relevant to understanding how data travels between a client and a server.
+
+## Key Concepts
+
+1. **Source and Destination IP Address:**
+   - **Source IP Address:** The IP address of the device sending the initial packet. In the case of a client connecting to a web server, the source IP address is that of the client.
+   - **Destination IP Address:** The IP address of the device receiving the packet. For an HTTP/3 web server, this is the IP address of the server.
+
+2. **Source and Destination Port:**
+   - **Source Port:** The port number on the source device (client) from which the packet is sent. Source ports are often dynamically chosen by the client.
+   - **Destination Port:** The port number on the destination device (server) to which the packet is sent. For HTTP/3, the standard port used is typically port 443.
+
+3. **Protocol:**
+   - The protocol used for communications. HTTP/3 uses the QUIC (Quick UDP Internet Connections) protocol, which is a transport protocol based on UDP.
+
+## Definition of the Bidirectional Flow
+
+A bidirectional flow for an HTTP/3 web server groups all packets exchanged between an IP address and port of the client and the IP address and port of the web server. Here’s how it is defined:
+
+- **Flow towards the server (incoming):** Each packet sent by the client to the server has the client's IP address as the source IP and the server's IP address as the destination IP. The source port is dynamically chosen by the client, and the destination port is typically port 443.
+  
+- **Flow from the server (outgoing):** Packets sent by the server in response to the client will have the server's IP address as the source IP and the client's IP address as the destination IP. The source port will then be 443 (or another port configured for HTTP/3 on the server), and the destination port will be the one initially chosen by the client.
+
+## Example of a Bidirectional Flow
+
+- **Incoming Flow:**
+  - **Source IP Address:** 192.168.1.10 (Client)
+  - **Source Port:** 52345 (dynamically chosen by the client)
+  - **Destination IP Address:** 203.0.113.5 (HTTP/3 Web Server)
+  - **Destination Port:** 443
+  - **Protocol:** QUIC/UDP
+
+- **Outgoing Flow:**
+  - **Source IP Address:** 203.0.113.5 (HTTP/3 Web Server)
+  - **Source Port:** 443
+  - **Destination IP Address:** 192.168.1.10 (Client)
+  - **Destination Port:** 52345
+  - **Protocol:** QUIC/UDP
+
+Thus, the bidirectional flow groups all packets exchanged in both directions (from the client to the server and from the server to the client) under a single logical entity. This grouping allows for coherent and efficient tracking and analysis of communications between a client and an HTTP/3 web server.
+
+
+
+
 
 ### Functionality of the Script
 
@@ -79,9 +118,6 @@ The following features are calculated for each detected bidirectional flow:
 | **Significant time gap in comparison to the total communication time ** | Count of time gaps detected between each packet using various thresholds relative to the total time of all packets for each identified agent. This metric is calculated for the incoming, outgoing, and bidirectional flows of the detected agents. |
 
 This detailed extraction and feature computation enable comprehensive analysis of the network traffic, aiding in understanding patterns and identifying anomalies.
-
-
-
 
 
 ### Link pcap file
