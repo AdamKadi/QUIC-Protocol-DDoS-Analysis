@@ -41,9 +41,7 @@ To capture traffic, the following `tcpdump` command was used:
 sudo tcpdump -i <interface> -w traffic_capture.pcap
 ```
 
-### Python Script for Bidirectional Flow Extraction
-
-# Definition of a Bidirectional Network Flow for an HTTP/3 Web Server
+## Definition of a Bidirectional Network Flow for an HTTP/3 Web Server
 
 A bidirectional network flow refers to a set of communications between two points on a network, characterized by the exchange of packets in both directions. In the context of a web server using the HTTP/3 protocol, these flows are particularly relevant to understanding how data travels between a client and a server.
 
