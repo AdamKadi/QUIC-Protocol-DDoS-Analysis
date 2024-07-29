@@ -100,6 +100,10 @@ The script performs the following tasks:
 
 ## Feature Extraction
 
+Features are extracted from bidirectionnal network to analyze and classify the nature of these flows.
+Each flow, comprising all packets between a client and an HTTP/3 web server, is examined to extract various features.
+Based on these features, class labels are assigned to the flows to categorize them to their nature.
+
 The following features are calculated for each detected bidirectional flow:
 
 | Feature Description | Calculation |
