@@ -40,13 +40,13 @@ We extracted several features from each bidirectional flow to analyze and classi
 
 ## Dataset description
 
-## The HTTP GET flood class involves a bot establishing a connection with the web server and continuously sending GET requests over this connection throughout the attack. This results in a single bidirectional flow between the bot and the web server during the attack.
+ The HTTP GET flood class involves a bot establishing a connection with the web server and continuously sending GET requests over this connection throughout the attack. This results in a single bidirectional flow between the bot and the web server during the attack.
 
-## The Normal Use class involves a bot establishing a connection with the web server and emulating a web client to navigate between the client and the server. This class represents the bidirectional flows of such traffic, reflecting typical web interactions.
+ The Normal Use class involves a bot establishing a connection with the web server and emulating a web client to navigate between the client and the server. This class represents the bidirectional flows of such traffic, reflecting typical web interactions.
 
-## The QUIC connection flood class involves a bot initiating a connection with the web server, and then opening another connection. This means that a single bot initiates multiple bidiretional flows during the attack phase on the web server. This class represents the bidirectional flow generated during this type of attack.
+ The QUIC connection flood class involves a bot initiating a connection with the web server, and then opening another connection. This means that a single bot initiates multiple bidiretional flows during the attack phase on the web server. This class represents the bidirectional flow generated during this type of attack.
 
-## The QUIC scan involves a bot initiating a connection with the web server, executing a GET request, and then opening another connection. This means a single bot initiates multiple bidirectional flows, each including a GET request, during the attack phase on the web server. This class represents this bidirectionnal flows generated. 
+ The QUIC scan involves a bot initiating a connection with the web server, executing a GET request, and then opening another connection. This means a single bot initiates multiple bidirectional flows, each including a GET request, during the attack phase on the web server. This class represents this bidirectionnal flows generated. 
 
 ## Tools and Credits
 
