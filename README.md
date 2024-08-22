@@ -50,5 +50,9 @@ We extracted several features from each bidirectional flow to analyze and classi
 
 ## Tools and Credits
 
+You can find traffic captures on this link : 
+https://www.kaggle.com/datasets/adam357/quic-network-capture-data
+
 The network traffic captures were obtained using tools provided by 6cure, a company specializing in DDoS protection and mitigation 
 https://www.6cure.com/en/
+
