@@ -39,7 +39,7 @@ We extracted several features from each bidirectional flow to analyze and classi
 
 The dataset 1 contains two classes: class 0, which includes flows categorized as normal, and class 1, wixh comprises bidirectional flows as malicious(including Scan, QUIC connect and Get flood)
 
-The dataset contains four classes: class 0, which includes bidirectional flows categorized as normal; class 1, which consists of bidirectional flows of the QUIC Connect type; class 3, which corresponds to bidirectional flows of the Scan type; and class 4, which comprises bidirectional flows of the Get flood type.
+The dataset 2 contains four classes: class 0, which includes bidirectional flows categorized as normal; class 1, which consists of bidirectional flows of the QUIC Connect type; class 3, which corresponds to bidirectional flows of the Scan type; and class 4, which comprises bidirectional flows of the Get flood type.
 
 
 ## Dataset description
