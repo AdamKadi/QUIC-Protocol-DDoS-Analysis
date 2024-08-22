@@ -1,4 +1,4 @@
-# Network Traffic Analysis Overview
+# Resources for QUIC Traffic Analysis
 
 This README outlines key aspects of our network traffic analysis, focusing on the target web server, the bidirectional flows studied, the features extracted, and the dataset classes.
 
@@ -36,6 +36,10 @@ We extracted several features from each bidirectional flow to analyze and classi
 - **Normal Use**: A bot simulates typical web browsing behavior.
 - **QUIC Connection Flood**: A bot initiates multiple connections without sending data.
 - **QUIC Scan**: A bot initiates connections, sends a GET request, and repeats.
+
+The dataset 1 contains two classes: class 0, which includes flows categorized as normal, and class 1, wixh comprises bidirectional flows as malicious(including Scan, QUIC connect and Get flood)
+
+The dataset contains four classes: class 0, which includes bidirectional flows categorized as normal; class 1, which consists of bidirectional flows of the QUIC Connect type; class 3, which corresponds to bidirectional flows of the Scan type; and class 4, which comprises bidirectional flows of the Get flood type.
 
 
 ## Dataset description
