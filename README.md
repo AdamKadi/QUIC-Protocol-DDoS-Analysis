@@ -52,7 +52,16 @@ The dataset 2 contains four classes: class 0, which includes bidirectional flows
 
  The QUIC scan involves a bot initiating a connection with the web server, executing a GET request, and then opening another connection. This means a single bot initiates multiple bidirectional flows, each including a GET request, during the attack phase on the web server. This class represents this bidirectionnal flows generated. 
 
+
 ## Tools and Credits
+
+
+`script.py` is designed to analyze packet capture (PCAP) files containing QUIC traffic. This script takes a PCAP file as input and outputs a csv file containing a set of computed for each bidirectional flow detected in the traffic.
+
+```bash
+python3 script.py input.pcap
+
+```
 
 You can find traffic captures on this link : 
 https://www.kaggle.com/datasets/adam357/quic-network-capture-data
