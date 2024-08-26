@@ -62,6 +62,8 @@ The dataset 2 contains four classes: class 0, which includes bidirectional flows
 python3 script.py input.pcap
 
 ```
+The script does not label the flows in the generated CSV file.
+
 
 You can find traffic captures on this link : 
 https://www.kaggle.com/datasets/adam357/quic-network-capture-data
